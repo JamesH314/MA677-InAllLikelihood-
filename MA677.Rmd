@@ -1,0 +1,58 @@
+---
+title: "MA677"
+author: "Yifeng He"
+date: "5/5/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 4.25
+A coin with probability p for heads is tossed n times. Let E be the event “a head is obtained on the first toss’ and Fk the event ‘exactly k heads are obtained.” For which pairs (n, k) are E and Fk independent?
+
+```{r}
+
+```
+
+## 4.27
+
+```{r}
+Jan_1940<-c(0.15,0.25,0.10,0.20,1.85,1.97,0.80,0.20,0.10,0.50,0.82,0.40,1.80,0.20,1.12,1.83,
+       0.45,3.17,0.89,0.31,0.59,0.10,0.10,0.90,0.10,0.25,0.10,0.90)
+Jul_1940<-c(0.30,0.22,0.10,0.12,0.20,0.10,0.10,0.10,0.10,0.10,0.10,0.17,0.20,2.80,0.85,0.10,
+       0.10,1.23,0.45,0.30,0.20,1.20,0.10,0.15,0.10,0.20,0.10,0.20,0.35,0.62,0.20,1.22,
+       0.30,0.80,0.15,1.53,0.10,0.20,0.30,0.40,0.23,0.20,0.10,0.10,0.60,0.20,0.50,0.15,
+      0.60,0.30,0.80,1.10)
+```
+
+# (a) Compare the summary statistics for the two months.
+```{r}
+summary(Jan_1940)
+summary(Jul_1940)
+```
+
+# (b) Look at QQ-plot
+```{r}
+qqnorm(Jan_1940)
+qqline(Jan_1940)
+
+qqnorm(Jul_1940)
+qqline(Jul_1940)
+```
+
+# (c) Fit gamma model
+```{r}
+glm()
+```
+
+
+## 4.39
+
+
+```{r}
+
+```
+
+
