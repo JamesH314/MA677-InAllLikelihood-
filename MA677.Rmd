@@ -9,13 +9,10 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 4.25
+# 4.25
 A coin with probability p for heads is tossed n times. Let E be the event “a head is obtained on the first toss’ and Fk the event ‘exactly k heads are obtained.” For which pairs (n, k) are E and Fk independent?
 
 ```{r}
-#I found reference in this website.
-#https://stackoverflow.com/questions/24211595/order-statistics-in-r?msclkid=fd6683dac5671
-
 f <- function(x, mu=0, sigma=1) dunif(x, mu, sigma)
 F <- function(x, mu=0, sigma=1) punif(x, mu, sigma, lower.tail=FALSE)
 
@@ -43,7 +40,7 @@ E(5,10)
 med(5,10)
 ```
 
-## 4.27
+# 4.27
 
 ```{r}
 Jan_1940<-c(0.15,0.25,0.10,0.20,1.85,1.97,0.80,0.20,0.10,0.50,0.82,0.40,1.80,0.20,1.12,1.83,
@@ -54,13 +51,13 @@ Jul_1940<-c(0.30,0.22,0.10,0.12,0.20,0.10,0.10,0.10,0.10,0.10,0.10,0.17,0.20,2.8
       0.60,0.30,0.80,1.10)
 ```
 
-# (a) Compare the summary statistics for the two months.
+## (a) Compare the summary statistics for the two months.
 ```{r}
 summary(Jan_1940)
 summary(Jul_1940)
 ```
 
-# (b) Look at QQ-plot
+## (b) Look at QQ-plot
 Should try out different plots, like glm.
 ```{r}
 qqnorm(Jan_1940)
@@ -70,9 +67,9 @@ qqnorm(Jul_1940)
 qqline(Jul_1940)
 ```
 
-# (c) Fit gamma model and compare parameters
-```{r}
-install.packages('fitdistrplus')
+## (c) Fit gamma model and compare parameters
+```{r, message=FALSE, warning=FALSE}
+#install.packages('fitdistrplus')
 library(fitdistrplus)
 
 fit_Jan <- fitdist(Jan_1940, distr = "gamma", method = "mle")
@@ -82,7 +79,7 @@ summary(fit_Jan)
 summary(fit_Jul)
 ```
 The profile likelihood shown below. July's model is slightly better than Jan's model.
-```{r}
+```{r, message=FALSE, warning=FALSE}
 x = Jan_1940 
 prof_log_lik=function(a){
    b=(optim(1,function(z) -sum(log(dgamma(x,a,z)))))$par
@@ -104,7 +101,7 @@ prof_log_lik_y=function(a){
 ```
 
 
-# (d) Check gamma model
+## (d) Check gamma model
 Jul is a little bit better fit.
 ```{r}
 set.seed(2022);
@@ -121,7 +118,7 @@ abline(a = 0, b = 1, col = "red");
 ```
 
 
-## 4.39
+# 4.39
 ```{r}
 weight <- c(0.4,1.0,1.9,3.0,5.5,8.1,12.1,25.6,50,56,70,115.0,115.0,119.5,154.5,157,175.0,179.0,180.0,406.0,419.0,
             423.0,440.0,655.0,680.0,1320.0,4603.0,5712.0)
@@ -137,14 +134,51 @@ summary(new_model)
 ```
 
 
-## Illinois
+# Illinois
 Use the data to identify the distribution of rainfall produced by the storms in southern Illinois. Estimate the parameters of the distribution using MLE. Prepare a discussion of your estimation, including how confident you are about your identification of the distribution and the accuracy of your parameter estimates.
 
 Using this distribution, identify wet years and dry years. Are the wet years wet because there were more storms, because individual storms produced more rain, or for both of these reasons?
 
-To what extent do you believe the results of your analysis are generalizable? What do you think the next steps would be after the analysis? An article by Floyd Huff, one of the authors of the 1967 report is included.
+
 ```{r}
-readxl::read_xlsx("Illinois_rain_1960-1964(1).xlsx")
+rain <- readxl::read_xlsx("Illinois_rain_1960-1964(1).xlsx")
+#View(rain)
 
-
+d1960 <- plot(density(na.omit(rain$`1960`)))
+d1961 <- plot(density(na.omit(rain$`1961`)))
+d1962 <- plot(density(na.omit(rain$`1962`)))
+d1963 <- plot(density(na.omit(rain$`1963`)))
+d1964 <- plot(density(na.omit(rain$`1964`)))
 ```
+
+From the density graphs above, it seems that 1961 and 1963 are wet years and others are dry years. The table below shows the number of storms at each year and the mean rain value. From that table, one can see that year 1961 has the largest rain and year 1963 has the second highest. However, the number of storm they have are not the highest. Therefore, I suppose that the standard for deciding wet and dry years should be combining the number of storms and the rain amount.
+
+The confidence interval are also shown below with each years estimation.
+```{r}
+fit_rain <- fitdist(unlist(na.omit(rain)), distr = "gamma", method = "mle")
+summary(bootdist(fit_rain))
+
+fit_rain1960 <- fitdist(c(unlist(na.omit(rain$`1960`))), distr = "gamma", method = "mle")
+summary(bootdist(fit_rain1960))
+fit_rain1961 <- fitdist(c(unlist(na.omit(rain$`1961`))), distr = "gamma", method = "mle")
+summary(bootdist(fit_rain1961))
+fit_rain1962 <- fitdist(c(unlist(na.omit(rain$`1962`))), distr = "gamma", method = "mle")
+summary(bootdist(fit_rain1962))
+fit_rain1963 <- fitdist(c(unlist(na.omit(rain$`1963`))), distr = "gamma", method = "mle")
+summary(bootdist(fit_rain1963))
+fit_rain1964 <- fitdist(c(unlist(na.omit(rain$`1964`))), distr = "gamma", method = "mle")
+summary(bootdist(fit_rain1964))
+
+year_name <- c("1960","1961","1962","1963","1964")
+mean <- c(mean(na.omit(rain$`1960`)),mean(na.omit(rain$`1961`)),mean(na.omit(rain$`1962`)),
+          mean(na.omit(rain$`1963`)),mean(na.omit(rain$`1964`)))
+number_storm <- c(nrow(rain)-apply(is.na(rain),2,sum))
+df1 <- data.frame(mean,number_storm)
+```
+
+To what extent do you believe the results of your analysis are generalizable? What do you think the next steps would be after the analysis? An article by Floyd Huff, one of the authors of the 1967 report is included.
+
+From the perspective of the report by Floyd Huff, the results of the analysis is not highly generalized to the real weather condition. However, since the report only mentions extreme storms and weathers, it is not clear that the analysis results can be used to predict normal and daily weather. 
+
+There are several steps that we can do based on the analysis. First, gather more detailed data, like mean frequency relations mentioned in the report, so that the analysis can be used to predict extreme weather conditions. Secondly, we can do more research about everyday weather prediction, which may be based on the mean value of amount of rainfall, so that the analysis could assist the prediction.
+
