@@ -5,7 +5,7 @@ date: "5/5/2022"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -61,6 +61,7 @@ summary(Jul_1940)
 ```
 
 # (b) Look at QQ-plot
+Should try out different plots, like glm.
 ```{r}
 qqnorm(Jan_1940)
 qqline(Jan_1940)
@@ -71,15 +72,79 @@ qqline(Jul_1940)
 
 # (c) Fit gamma model and compare parameters
 ```{r}
+install.packages('fitdistrplus')
+library(fitdistrplus)
 
+fit_Jan <- fitdist(Jan_1940, distr = "gamma", method = "mle")
+fit_Jul <- fitdist(Jul_1940, distr = "gamma", method = "mle")
+
+summary(fit_Jan)
+summary(fit_Jul)
+```
+The profile likelihood shown below. July's model is slightly better than Jan's model.
+```{r}
+x = Jan_1940 
+prof_log_lik=function(a){
+   b=(optim(1,function(z) -sum(log(dgamma(x,a,z)))))$par
+   return(-sum(log(dgamma(x,a,b))))
+ }
+ vx=seq(.1,3,length=40)
+ vl=-Vectorize(prof_log_lik)(vx)
+ plot(vx,vl,type="l")
+
+ 
+y = Jul_1940 
+prof_log_lik_y=function(a){
+   b=(optim(1,function(z) -sum(log(dgamma(y,a,z)))))$par
+   return(-sum(log(dgamma(y,a,b))))
+ }
+ vx=seq(.1,3,length=40)
+ vl=-Vectorize(prof_log_lik_y)(vx)
+ plot(vx,vl,type="l")
+```
+
+
+# (d) Check gamma model
+Jul is a little bit better fit.
+```{r}
+set.seed(2022);
+
+Jan <- sort(Jan_1940);
+Jan0 <- qgamma(ppoints(length(Jan)), shape = 2, rate = 1);
+plot(x = Jan0, y = Jan, xlab = "Theoretical quantiles", ylab = "Observed quantiles");
+abline(a = 0, b = 1, col = "red");
+
+Jul <- sort(Jul_1940);
+Jul0 <- qgamma(ppoints(length(Jul)), shape = 2, rate = 1);
+plot(x = Jul0, y = Jul, xlab = "Theoretical quantiles", ylab = "Observed quantiles");
+abline(a = 0, b = 1, col = "red");
 ```
 
 
 ## 4.39
-
-
 ```{r}
+weight <- c(0.4,1.0,1.9,3.0,5.5,8.1,12.1,25.6,50,56,70,115.0,115.0,119.5,154.5,157,175.0,179.0,180.0,406.0,419.0,
+            423.0,440.0,655.0,680.0,1320.0,4603.0,5712.0)
 
+bc <- boxcox(weight ~ 1)
+lambda <- bc$x[which.max(bc$y)]
+lambda
+
+new_data <- data.frame((weight^lambda-1)/lambda)
+
+new_model <- lm(((weight^lambda-1)/lambda) ~ weight)
+summary(new_model)
 ```
 
 
+## Illinois
+Use the data to identify the distribution of rainfall produced by the storms in southern Illinois. Estimate the parameters of the distribution using MLE. Prepare a discussion of your estimation, including how confident you are about your identification of the distribution and the accuracy of your parameter estimates.
+
+Using this distribution, identify wet years and dry years. Are the wet years wet because there were more storms, because individual storms produced more rain, or for both of these reasons?
+
+To what extent do you believe the results of your analysis are generalizable? What do you think the next steps would be after the analysis? An article by Floyd Huff, one of the authors of the 1967 report is included.
+```{r}
+readxl::read_xlsx("Illinois_rain_1960-1964(1).xlsx")
+
+
+```
