@@ -13,7 +13,34 @@ knitr::opts_chunk$set(echo = TRUE)
 A coin with probability p for heads is tossed n times. Let E be the event “a head is obtained on the first toss’ and Fk the event ‘exactly k heads are obtained.” For which pairs (n, k) are E and Fk independent?
 
 ```{r}
+#I found reference in this website.
+#https://stackoverflow.com/questions/24211595/order-statistics-in-r?msclkid=fd6683dac5671
 
+f <- function(x, mu=0, sigma=1) dunif(x, mu, sigma)
+F <- function(x, mu=0, sigma=1) punif(x, mu, sigma, lower.tail=FALSE)
+
+integrand <- function(x,r,n) {
+  x * (1 - F(x))^(r-1) * F(x)^(n-r) * f(x)
+}
+
+E <- function(r,n) {
+  (1/beta(r,n-r+1)) * integrate(integrand,-Inf,Inf, r, n)$value
+}
+
+
+med <- function(i,n)
+  { 
+  medi<-(i-1/3)/(n+1/3) 
+  return(medi)
+}
+
+E(2.5,5)
+
+med(2.5,5)
+
+E(5,10)
+
+med(5,10)
 ```
 
 ## 4.27
@@ -42,9 +69,9 @@ qqnorm(Jul_1940)
 qqline(Jul_1940)
 ```
 
-# (c) Fit gamma model
+# (c) Fit gamma model and compare parameters
 ```{r}
-glm()
+
 ```
 
 
